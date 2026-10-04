@@ -1,69 +1,76 @@
 # Recording Applications to Google Sheets
 
 The form posts every submission to a **Google Apps Script Web App**, which writes
-a row into your Google Sheet (resumes are saved into a Drive folder and linked
-in the sheet).
+a row into your Google Sheet («Applications» tab). Resumes are saved to a Drive
+folder named «Resumes» and linked in the `resumeLink` column.
 
-## Step 1 — Create the Google Sheet
+## One-time setup (Steps 1–3)
 
-1. Go to https://sheets.new
-2. Name it e.g. `MLP Job Applications`
-3. Note the **Spreadsheet ID** — the long string in the URL between
-   `/d/` and `/edit` (you'll paste it into the script below).
-   Example: `1AbC...xYz` from
-   `https://docs.google.com/spreadsheets/d/1AbC...xYz/edit`
+### Step 1 — Create the Google Sheet
 
-## Step 2 — Add the Apps Script
+1. Go to https://sheets.new and name it e.g. `MLP Job Applications`.
+
+### Step 2 — Add the script
 
 1. In the sheet: **Extensions → Apps Script**
-2. Delete the sample code, paste the script below
-3. Replace `PASTE_SPREADSHEET_ID_HERE` with your Spreadsheet ID
-4. Save (Ctrl+S), name the project e.g. `MLP Applications API`
+2. Delete any sample code and paste the script below (it must be created from
+   inside the sheet, so `getActiveSpreadsheet()` points at it).
+3. Save (Ctrl+S).
 
 ```javascript
-var SPREADSHEET_ID = ''; // leave blank if this script is bound to the sheet (Extensions > Apps Script)
-
 function doPost(e) {
   try {
     var lock = LockService.getScriptLock();
     lock.waitLock(30000);
 
     var data = JSON.parse(e.postData.contents);
-    var ss = SPREADSHEET_ID
-      ? SpreadsheetApp.openById(SPREADSHEET_ID)
-      : SpreadsheetApp.getActiveSpreadsheet();
-    if (!ss) throw new Error('No bound spreadsheet found. Deploy from inside the sheet (Extensions > Apps Script).');
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    if (!ss) throw new Error('Script must be created from inside the Google Sheet (Extensions > Apps Script).');
 
     var sheet = ss.getSheetByName('Applications') || ss.insertSheet('Applications');
-    var questions = ss.getSheetByName('Questions') || ss.insertSheet('Questions');
-    var subFolder = getFolder_(ss.getId(), 'Resumes');
+    sheet.setFrozenRows(1);
 
-    // Resume
+    // Save resume to Drive folder "Resumes", share as view link
     var resumeLink = '';
     if (data.resumeName && data.resumeBase64) {
+      var it = DriveApp.getFoldersByName('Resumes');
+      var folder = it.hasNext() ? it.next() : DriveApp.createFolder('Resumes');
+      var safeName = ((data.firstName || 'applicant') + '-' + (data.lastName || '')).replace(/\s+/g, '_');
+      var ext = (String(data.resumeName).match(/\.[^.]+$/) || [''])[0];
       var blob = Utilities.newBlob(Utilities.base64Decode(data.resumeBase64),
-        data.resumeType || 'application/octet-stream', data.resumeName);
-      var file = subFolder.createFile(blob);
+        data.resumeType || 'application/octet-stream',
+        safeName + '-resume' + ext);
+      var file = folder.createFile(blob);
       file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
       resumeLink = file.getUrl();
     }
 
-    // Headers (auto-create)
-    var keys = Object.keys(data).filter(function (k) {
+    // Columns = every field the form sent (minus raw file data), always plus resumeLink & ReceivedAt
+    var columns = Object.keys(data).filter(function (k) {
       return k !== 'resumeBase64' && k !== 'resumeType';
-    });
-    keys = keys.concat(resumeLink ? ['resumeLink'] : ['resumeLink']);
-    if (sheet.getLastRow() === 0) {
-      sheet.appendRow(keys.concat(['ReceivedAt']));
+    }).concat(['resumeLink', 'ReceivedAt']);
+
+    var lastCol = sheet.getLastColumn();
+    var headers = lastCol ? sheet.getRange(1, 1, 1, lastCol).getValues()[0] : [];
+
+    // Auto-add any columns that don't exist yet (e.g., new questions added later)
+    var additions = columns.filter(function (c) { return headers.indexOf(c) === -1; });
+    if (additions.length) {
+      if (lastCol === 0) {
+        sheet.getRange(1, 1, 1, additions.length).setValues([additions]);
+      } else {
+        sheet.getRange(1, lastCol + 1, 1, additions.length).setValues([additions]);
+      }
+      headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
     }
-    var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
 
     var row = headers.map(function (h) {
-      if (h === 'resumeLink') return resumeLink;
       if (h === 'ReceivedAt') return new Date();
-      return data[h] !== undefined ? data[h] : '';
+      if (h === 'resumeLink') return resumeLink;
+      var v = data[h];
+      return (v === undefined || v === null) ? '' : v;
     });
-    sheet.appendRow(row);
+    if (row.length) sheet.appendRow(row);
 
     lock.releaseLock();
     return ContentService.createTextOutput(JSON.stringify({ result: 'success' }))
@@ -73,34 +80,36 @@ function doPost(e) {
       .setMimeType(ContentService.MimeType.JSON);
   }
 }
-
-function getFolder_(parentId, name) {
-  var parent = DriveApp.getFileById(parentId);
-  var it = parent.getParents().next().getFoldersByName(name);
-  return it.hasNext() ? it.next()
-    : parent.getParents().next().createFolder(name);
-}
 ```
 
-## Step 3 — Deploy the Web App
+### Step 3 — Deploy
 
-1. In the Apps Script editor: **Deploy → New deployment**
-2. Gear icon (Select type) → **Web app**
-3. Description: anything; **Execute as: Me**;
-   **Who has access: Anyone** (important — applicants don't log in)
-4. Click **Deploy** → authorize the permissions when prompted
-   (it will warn "unverified app" → **Advanced → Go to project (unsafe)** — this is your own script)
-5. Copy the **Web app URL** (ends in `/exec`)
+1. **Deploy → New deployment** → gear icon → **Web app**
+2. Execute as: **Me**  |  Who has access: **Anyone**
+3. Deploy → authorize (the "unverified app" warning is your own script:
+   **Advanced → Go to project (unsafe)**).
+4. Copy the Web App URL (ends in `/exec`) and put it in `index.html` as
+   `APP_SCRIPT_URL` in the `<script>` section, then commit & push.
 
-## Step 4 — Connect the form
+## Updating the script after a change (important!)
 
-1. Open the form's `index.html`
-2. Find the line near the top of the `<script>`:
-   ```js
-   var APP_SCRIPT_URL = 'PASTE_YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
-   ```
-3. Replace `PASTE_YOUR_GOOGLE_APPS_SCRIPT_URL_HERE` with your `/exec` URL
-4. Commit & push (or ask me to do it)
+Deployments snapshot the code. After editing the script you MUST publish it:
 
-Test: open the live form, fill it out, submit, and check the `Applications`
-tab in your sheet — a new row should appear.
+**Deploy → Manage deployments → ✏️ (edit) → Version: New version → Deploy**
+
+The URL stays the same. If you skip this, the old code keeps running.
+
+## Migrating an existing sheet (already-deployed case)
+
+If columns were created by an earlier test (e.g., only firstName/lastName):
+1. Right-click the **Applications** tab → **Delete**
+   (or just delete the header row 1)
+2. Redeploy a new version (above)
+3. Submit another test applicant — all columns (email, phone, position,
+   A1–A10, LQ/LO answers, resumeLink, etc.) will be created automatically.
+
+## Verify a resume link
+
+Attach a PDF when test-submitting. After the row appears, open `resumeLink` —
+it points to the uploaded file in the Drive «Resumes» folder (view access via
+link for recruiters).
