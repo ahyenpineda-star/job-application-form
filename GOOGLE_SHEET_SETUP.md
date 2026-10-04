@@ -21,7 +21,7 @@ in the sheet).
 4. Save (Ctrl+S), name the project e.g. `MLP Applications API`
 
 ```javascript
-var SPREADSHEET_ID = 'PASTE_SPREADSHEET_ID_HERE';
+var SPREADSHEET_ID = ''; // leave blank if this script is bound to the sheet (Extensions > Apps Script)
 
 function doPost(e) {
   try {
@@ -29,7 +29,10 @@ function doPost(e) {
     lock.waitLock(30000);
 
     var data = JSON.parse(e.postData.contents);
-    var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    var ss = SPREADSHEET_ID
+      ? SpreadsheetApp.openById(SPREADSHEET_ID)
+      : SpreadsheetApp.getActiveSpreadsheet();
+    if (!ss) throw new Error('No bound spreadsheet found. Deploy from inside the sheet (Extensions > Apps Script).');
 
     var sheet = ss.getSheetByName('Applications') || ss.insertSheet('Applications');
     var questions = ss.getSheetByName('Questions') || ss.insertSheet('Questions');
