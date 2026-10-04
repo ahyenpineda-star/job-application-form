@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Job Application Form</title>
+<title>MLP Company - Job Application Form</title>
 <style>
   * {
     margin: 0;
@@ -21,6 +21,65 @@
     padding: 20px;
   }
 
+  .brand {
+    text-align: center;
+    margin-bottom: 28px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid #eee9f9;
+  }
+
+  .brand-logo {
+    width: 84px;
+    height: 84px;
+    margin: 0 auto 14px;
+    display: block;
+    filter: drop-shadow(0 6px 14px rgba(90, 63, 212, 0.35));
+  }
+
+  .brand-name {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: #2d2350;
+    text-transform: uppercase;
+  }
+
+  .brand-tagline {
+    margin-top: 6px;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 13px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #8a7fae;
+  }
+
+  .brand-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 14px auto 0;
+    max-width: 300px;
+  }
+
+  .brand-divider::before,
+  .brand-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #b9a7ec);
+  }
+
+  .brand-divider::after {
+    background: linear-gradient(to left, transparent, #b9a7ec);
+  }
+
+  .brand-divider svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
   .form-container {
     background: #fff;
     width: 100%;
@@ -36,9 +95,11 @@
   }
 
   .form-header h1 {
+    font-family: Georgia, 'Times New Roman', serif;
     color: #333;
-    font-size: 26px;
+    font-size: 24px;
     margin-bottom: 8px;
+    letter-spacing: 0.5px;
   }
 
   .form-header p {
@@ -325,8 +386,44 @@
 </head>
 <body>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#667eea"/>
+      <stop offset="100%" stop-color="#764ba2"/>
+    </linearGradient>
+    <symbol id="mlpLogo" viewBox="0 0 100 110">
+      <path d="M50 3 96 22 H96 V63 C96 88 76 102 50 107 24 102 4 88 4 63 V22 Z"
+            fill="url(#logoGrad)" stroke="#2d2350" stroke-width="2.5"/>
+      <path d="M50 11 89 27 V63 C89 84 72 96 50 101 28 96 11 84 11 63 V27 Z"
+            fill="none" stroke="#ffffff" stroke-opacity="0.55" stroke-width="1.6" stroke-dasharray="3 4"/>
+      <text x="50" y="60" text-anchor="middle" font-family="Georgia, serif"
+            font-size="34" font-weight="bold" fill="#ffffff" letter-spacing="1">MLP</text>
+      <path d="M27 74 L41 74 L46 66 L53 80 L59 62 L64 74 L73 74"
+            fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+            opacity="0.95"/>
+      <circle cx="73" cy="74" r="3" fill="#ffffff" opacity="0.95"/>
+      <g fill="#f4d58d">
+        <circle cx="27" cy="27" r="1.6"/>
+        <circle cx="71" cy="22" r="1.6"/>
+        <circle cx="83" cy="47" r="2"/>
+        <circle cx="17" cy="52" r="2"/>
+        <circle cx="50" cy="90" r="1.6"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
 <section id="page1" class="page">
 <div class="form-container">
+  <div class="brand">
+    <svg class="brand-logo" viewBox="0 0 100 110"><use href="#mlpLogo"/></svg>
+    <div class="brand-name">MLP <span class="amp">Company</span></div>
+    <div class="brand-tagline">Trades & Stocks Market</div>
+    <div class="brand-divider">
+      <svg viewBox="0 0 14 14"><path d="M1 8 L4.5 8 L6 4.5 L8 10 L9.5 7 L13 7" fill="none" stroke="#7a5cd6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
   <div class="form-header">
     <h1>Job Application Form</h1>
     <p>Please fill out all required fields (<span class="required">*</span>) to apply.</p>
@@ -502,6 +599,14 @@
 
 <section id="page2" class="page" hidden>
 <div class="form-container">
+  <div class="brand">
+    <svg class="brand-logo" viewBox="0 0 100 110"><use href="#mlpLogo"/></svg>
+    <div class="brand-name">MLP <span class="amp">Company</span></div>
+    <div class="brand-tagline">Trades & Stocks Market</div>
+    <div class="brand-divider">
+      <svg viewBox="0 0 14 14"><path d="M1 8 L4.5 8 L6 4.5 L8 10 L9.5 7 L13 7" fill="none" stroke="#7a5cd6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
   <div class="form-header">
     <h1>Character & Behavioral Assessment</h1>
     <p>Part 2 of 3 &mdash; Answer honestly; there are no right or wrong answers.</p>
@@ -528,6 +633,14 @@
 
 <section id="page3" class="page" hidden>
 <div class="form-container">
+  <div class="brand">
+    <svg class="brand-logo" viewBox="0 0 100 110"><use href="#mlpLogo"/></svg>
+    <div class="brand-name">MLP <span class="amp">Company</span></div>
+    <div class="brand-tagline">Trades & Stocks Market</div>
+    <div class="brand-divider">
+      <svg viewBox="0 0 14 14"><path d="M1 8 L4.5 8 L6 4.5 L8 10 L9.5 7 L13 7" fill="none" stroke="#7a5cd6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
   <div class="form-header">
     <h1>Loyalty & Commitment Check</h1>
     <p>Part 3 of 3 &mdash; Final step. Answer honestly; there are no right or wrong answers.</p>
