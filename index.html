@@ -182,6 +182,136 @@
     margin-top: 14px;
   }
 
+  .step-indicator {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .step-dot {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #5a3fd4;
+    background: #efeafd;
+    border-radius: 999px;
+    padding: 6px 16px;
+    letter-spacing: 0.5px;
+  }
+
+  .assessment-intro {
+    font-size: 13.5px;
+    color: #666;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+
+  .lang-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 8px;
+  }
+
+  .lang-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .lang-btn {
+    padding: 9px 24px;
+    border-radius: 999px;
+    border: 1.5px solid #d9d9e3;
+    background: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    color: #555;
+    transition: all 0.2s;
+  }
+
+  .lang-btn.active {
+    background: #5a3fd4;
+    color: #fff;
+    border-color: #5a3fd4;
+  }
+
+  .q-card {
+    border: 1px solid #eceaf5;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    background: #fafafc;
+  }
+
+  .q-card .q-text {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+    line-height: 1.45;
+  }
+
+  .q-card.missing {
+    border-color: #e53e3e;
+    background: #fff5f5;
+  }
+
+  .q-error {
+    display: none;
+    color: #e53e3e;
+    font-size: 12.5px;
+    margin-top: 8px;
+    font-weight: 600;
+  }
+
+  .q-card.missing .q-error {
+    display: block;
+  }
+
+  .scale-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .scale-row label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #555;
+    background: #fff;
+    border: 1.5px solid #e2e0ef;
+    border-radius: 999px;
+    padding: 7px 12px;
+    cursor: pointer;
+    margin-bottom: 0;
+  }
+
+  .scale-row input {
+    width: 15px;
+    height: 15px;
+    margin: 0;
+  }
+
+  .back-link {
+    background: none;
+    border: none;
+    color: #5a3fd4;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 12px;
+    padding: 0;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
   @media (max-width: 560px) {
     .form-container {
       padding: 26px 20px;
@@ -195,6 +325,7 @@
 </head>
 <body>
 
+<section id="page1" class="page">
 <div class="form-container">
   <div class="form-header">
     <h1>Job Application Form</h1>
@@ -344,17 +475,155 @@
       </div>
     </fieldset>
 
+    <button id="toStep2Btn" type="button" class="submit-btn">Continue to Assessment &rarr;</button>
+    <p class="form-note">Your information will be kept confidential and used only for recruitment purposes.</p>
+  </form>
+</div>
+</section>
+
+<section id="page2" class="page" hidden>
+<div class="form-container">
+  <div class="form-header">
+    <h1>Character & Behavioral Assessment</h1>
+    <p>Part 2 of 2 &mdash; Answer honestly; there are no right or wrong answers.</p>
+  </div>
+
+  <button id="backBtn" type="button" class="back-link">&larr; Back to Application Form</button>
+
+  <form id="assessmentForm">
+    <div class="form-group">
+      <label class="lang-label">Language for questions <span class="required">*</span></label>
+      <div class="lang-toggle" role="group" aria-label="Question language">
+        <button type="button" class="lang-btn active" data-lang="en">English</button>
+        <button type="button" class="lang-btn" data-lang="tl">Tagalog</button>
+      </div>
+    </div>
+
+    <div id="questionsWrap"></div>
+
     <button type="submit" class="submit-btn">Submit Application</button>
     <p class="form-note">Your information will be kept confidential and used only for recruitment purposes.</p>
   </form>
 </div>
+</section>
 
 <script>
-document.getElementById('applicationForm').addEventListener('submit', function (e) {
-  e.preventDefault();
-  alert('Thank you! Your application has been submitted.');
-  this.reset();
-});
+(function () {
+  var QUESTIONS = [
+    { en: "I am usually punctual and arrive on time for work or appointments.",
+      tl: "Kadalasan ako pumasok o dumadating nang maaga o tama-oras sa trabaho o mga appointment." },
+    { en: "When faced with a difficult task, I stay calm and look for solutions.",
+      tl: "Kapag may mahirap na gawain, nananatili akong kalmado at naghahanap ng solusyon." },
+    { en: "I take responsibility for my mistakes instead of blaming others.",
+      tl: "Inaako ko ang aking mga pagkakamali sa halip na isisi sa ibang tao." },
+    { en: "I work well with teammates, even those with different personalities.",
+      tl: "Marunong akong makisama sa mga kapwa trabahador, kahit magkakaiba ang ugali." },
+    { en: "I can follow instructions and company rules even when unsupervised.",
+      tl: "Kaya kong sundin ang mga instruksyon at patakaran ng kompanya kahit walang nagbabantay." },
+    { en: "I am comfortable telling a supervisor if I notice a problem at work.",
+      tl: "Walang problema sa akin na sabihan ang supervisor kapag may napansin akong mali sa trabaho." },
+    { en: "I stay productive even when the work becomes repetitive.",
+      tl: "Naging produktibo pa rin ako kahit paulit-ulit na lang ang gawain." },
+    { en: "I treat customers and coworkers with respect, even under pressure.",
+      tl: "Respeto ang trato ko sa mga customer at kapwa empleyado, kahit nasa ilalim ng pressure." },
+    { en: "I am willing to learn new skills or tools required for the job.",
+      tl: "Buong-puso akong handang matuto ng mga bagong kasanayang kailangan sa trabaho." },
+    { en: "I keep commitments and finish what I start.",
+      tl: "Tinutupad ko ang mga pangako ko at tinatapos ko ang sinimulan ko." }
+  ];
+
+  var SCALE_EN = ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"];
+  var SCALE_TL = ["Lubos na Hindi Sumasang-ayon", "Hindi Sumasang-ayon", "Walang Masabi / Neutral", "Sangsang-ayon", "Lubos na Sumasang-ayon"];
+  var REQUIRED_MSG_EN = "Please select an answer for this question.";
+  var REQUIRED_MSG_TL = "Piliin ang isang sagot para sa tanong na ito.";
+
+  var form = document.getElementById('applicationForm');
+  var step1Submit = document.getElementById('toStep2Btn');
+  var page1 = document.getElementById('page1');
+  var page2 = document.getElementById('page2');
+  var backBtn = document.getElementById('backBtn');
+  var wrap = document.getElementById('questionsWrap');
+  var lang = 'en';
+
+  var mainSubmitBtn = document.getElementById('assessmentForm').querySelector('button[type="submit"]');
+
+  function renderQuestions() {
+    var scale = lang === 'en' ? SCALE_EN : SCALE_TL;
+    var html = '';
+    QUESTIONS.forEach(function (q, i) {
+      html += '<div class="q-card" data-q="' + i + '">' +
+        '<div class="q-text">' + (i + 1) + '. ' + q[lang] + '</div>' +
+        '<div class="scale-row">';
+      scale.forEach(function (opt, v) {
+        html += '<label><input type="radio" name="q' + i + '" value="' + v + '"> ' + opt + '</label>';
+      });
+      html += '</div><div class="q-error">' + REQUIRED_MSG_EN + '</div></div>';
+    });
+    wrap.innerHTML = html;
+  }
+
+  renderQuestions();
+
+  document.querySelectorAll('.lang-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var prev = lang;
+      lang = btn.dataset.lang;
+      if (lang === prev) return;
+      document.querySelectorAll('.lang-btn').forEach(function (b) { b.classList.toggle('active', b === btn); });
+      var answers = {};
+      document.querySelectorAll('.q-card').forEach(function (card, i) {
+        var checked = card.querySelector('input:checked');
+        if (checked) answers[i] = checked.value;
+        card.classList.remove('missing');
+      });
+      renderQuestions();
+      Object.keys(answers).forEach(function (i) {
+        var input = wrap.querySelector('input[name="q' + i + '"][value="' + answers[i] + '"]');
+        if (input) input.checked = true;
+      });
+    });
+  });
+
+  function goStep2() {
+    if (!form.reportValidity()) return;
+    var missing = [];
+    wrap.querySelectorAll('.q-card').forEach(function (card) {
+      if (!card.querySelector('input:checked')) { card.classList.add('missing'); missing.push(card); }
+      else card.classList.remove('missing');
+    });
+    if (missing.length) {
+      missing[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    page1.hidden = true;
+    page2.hidden = false;
+    window.scrollTo({ top: 0 });
+  }
+
+  step1Submit.addEventListener('click', goStep2);
+
+  backBtn.addEventListener('click', function () {
+    page2.hidden = true;
+    page1.hidden = false;
+    window.scrollTo({ top: 0 });
+  });
+
+  mainSubmitBtn.addEventListener('click', function () {
+    var missing = [];
+    wrap.querySelectorAll('.q-card').forEach(function (card) {
+      if (!card.querySelector('input:checked')) { card.classList.add('missing'); missing.push(card); }
+      else card.classList.remove('missing');
+    });
+    if (missing.length) {
+      missing[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  });
+
+  document.getElementById('assessmentForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    alert('Thank you! Your application and assessment have been submitted.');
+  });
+})();
 </script>
 
 </body>
