@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Application Form</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .form-container {
+    background: #fff;
+    width: 100%;
+    max-width: 640px;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 40px;
+  }
+
+  .form-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .form-header h1 {
+    color: #333;
+    font-size: 26px;
+    margin-bottom: 8px;
+  }
+
+  .form-header p {
+    color: #777;
+    font-size: 14px;
+  }
+
+  fieldset {
+    border: none;
+    margin-bottom: 28px;
+  }
+
+  legend {
+    font-weight: 600;
+    color: #5a3fd4;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #e6e0f8;
+    width: 100%;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 16px;
+  }
+
+  .form-row .form-group {
+    flex: 1;
+  }
+
+  .form-group {
+    margin-bottom: 18px;
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 6px;
+  }
+
+  label .required {
+    color: #e53e3e;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="date"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid #d9d9e3;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #333;
+    background: #fafafc;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+    background: #fff;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 90px;
+  }
+
+  .radio-group {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  input[type="radio"],
+  input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    accent-color: #667eea;
+    cursor: pointer;
+  }
+
+  .checkbox-group label {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-weight: 500;
+    font-size: 13.5px;
+    color: #555;
+    cursor: pointer;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+  }
+
+  .submit-btn:active {
+    transform: translateY(0);
+  }
+
+  .form-note {
+    text-align: center;
+    font-size: 12px;
+    color: #999;
+    margin-top: 14px;
+  }
+
+  @media (max-width: 560px) {
+    .form-container {
+      padding: 26px 20px;
+    }
+    .form-row {
+      flex-direction: column;
+      gap: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="form-container">
+  <div class="form-header">
+    <h1>Job Application Form</h1>
+    <p>Please fill out all required fields (<span class="required">*</span>) to apply.</p>
+  </div>
+
+  <form id="applicationForm" action="#" method="post">
+
+    <fieldset>
+      <legend>Personal Details</legend>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName">First Name <span class="required">*</span></label>
+          <input type="text" id="firstName" name="firstName" required>
+        </div>
+        <div class="form-group">
+          <label for="lastName">Last Name <span class="required">*</span></label>
+          <input type="text" id="lastName" name="lastName" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="email">Email Address <span class="required">*</span></label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone Number <span class="required">*</span></label>
+          <input type="tel" id="phone" name="phone" placeholder="+63 9XX XXX XXXX" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="dob">Date of Birth</label>
+          <input type="date" id="dob" name="dob">
+        </div>
+        <div class="form-group">
+          <label>Gender</label>
+          <div class="radio-group">
+            <label><input type="radio" name="gender" value="male"> Male</label>
+            <label><input type="radio" name="gender" value="female"> Female</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nationality">Nationality</label>
+          <input type="text" id="nationality" name="nationality">
+        </div>
+        <div class="form-group">
+          <label for="civilStatus">Civil Status</label>
+          <select id="civilStatus" name="civilStatus">
+            <option value="">Select...</option>
+            <option>Single</option>
+            <option>Married</option>
+            <option>Divorced</option>
+            <option>Widowed</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="address">Home Address</label>
+        <textarea id="address" name="address" rows="2" placeholder="House / Unit No., Street, Barangay, City, Province, ZIP"></textarea>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Position</legend>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="position">Position Applied For <span class="required">*</span></label>
+          <select id="position" name="position" required>
+            <option value="">Select a position...</option>
+            <option>Administrative Assistant</option>
+            <option>Customer Service Representative</option>
+            <option>Graphic Designer</option>
+            <option>Sales Associate</option>
+            <option>Web Developer</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="startDate">Earliest Start Date</label>
+          <input type="date" id="startDate" name="startDate">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="salary">Expected Salary (monthly)</label>
+        <input type="text" id="salary" name="salary" placeholder="e.g. PHP 25,000">
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Education & Experience</legend>
+
+      <div class="form-group">
+        <label for="education">Highest Educational Attainment <span class="required">*</span></label>
+        <select id="education" name="education" required>
+          <option value="">Select...</option>
+          <option>High School Graduate</option>
+          <option>Vocational / Technical</option>
+          <option>College Undergraduate</option>
+          <option>Bachelor's Degree</option>
+          <option>Master's Degree</option>
+          <option>Doctorate</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="experience">Work Experience Summary</label>
+        <textarea id="experience" name="experience" rows="3" placeholder="Briefly describe your relevant work experience..."></textarea>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Application Details</legend>
+
+      <div class="form-group">
+        <label for="resume">Upload Resume <span class="required">*</span> (PDF or DOC, max 5MB)</label>
+        <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" required
+               style="border:1.5px dashed #c5c2d6; padding:12px; border-radius:8px; width:100%; background:#fafafc;">
+      </div>
+
+      <div class="form-group">
+        <label for="coverLetter">Cover Letter / Why should we hire you?</label>
+        <textarea id="coverLetter" name="coverLetter" rows="4" placeholder="Tell us why you're a great fit..."></textarea>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label>
+          <input type="checkbox" name="consent" required>
+          <span>I certify that the information provided is true and correct, and I consent to the processing of
+          my personal data for employment purposes. <span class="required">*</span></span>
+        </label>
+      </div>
+    </fieldset>
+
+    <button type="submit" class="submit-btn">Submit Application</button>
+    <p class="form-note">Your information will be kept confidential and used only for recruitment purposes.</p>
+  </form>
+</div>
+
+<script>
+document.getElementById('applicationForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  alert('Thank you! Your application has been submitted.');
+  this.reset();
+});
+</script>
+
+</body>
+</html>
