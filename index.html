@@ -690,14 +690,28 @@
 
     <div id="loyaltyWrap"></div>
 
-    <button type="submit" class="submit-btn">Submit Application</button>
+    <button id="finalSubmitBtn" type="submit" class="submit-btn">Submit Application</button>
     <p class="form-note">Your information will be kept confidential and used only for recruitment purposes.</p>
   </form>
 </div>
 </section>
 
+<section id="successPage" class="page" hidden>
+<div class="form-container" style="text-align:center; padding:60px 40px;">
+  <div style="font-size:64px; margin-bottom:10px;">&#10003;</div>
+  <div class="form-header" style="margin-bottom:10px;">
+    <h1 style="margin-bottom:6px;">Application Submitted</h1>
+    <p>Thank you for applying to MLP Company. We have received your application and assessment.<br>
+    Our recruitment team will contact you soon.</p>
+  </div>
+  <button type="button" class="submit-btn" onclick="location.reload()">Fill Out Another Application</button>
+</div>
+</section>
+
 <script>
 (function () {
+  var APP_SCRIPT_URL = 'PASTE_YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+
   var QUESTIONS = [
     { en: "I am usually punctual and arrive on time for work or appointments.",
       tl: "Kadalasan ako pumasok o dumadating nang maaga o tama-oras sa trabaho o mga appointment." },
@@ -757,6 +771,14 @@
   var lang = 'en';
 
   var step3Submit = document.getElementById('toStep3Btn');
+
+  function showSuccess() {
+    page1.hidden = true;
+    page2.hidden = true;
+    page3.hidden = true;
+    document.getElementById('successPage').hidden = false;
+    window.scrollTo({ top: 0 });
+  }
 
   function renderQuestions() {
     var scale = lang === 'en' ? SCALE_EN : SCALE_TL;
@@ -873,10 +895,48 @@
     window.scrollTo({ top: 0 });
   });
 
+  function handleSubmit() {
+    var payload = {};
+    new FormData(form).forEach(function (v, k) {
+      if (k !== 'resume') payload[k] = v;
+    });
+    payload.gender = (form.querySelector('input[name="gender"]:checked') || {}).value || '';
+    payload.resumeName = (form.querySelector('#resume').files[0] || {}).name || '';
+    QUESTIONS.forEach(function (q, i) {
+      payload['Q' + (i + 1) + ' (EN)'] = q.en;
+      payload['A' + (i + 1)] = (wrap.querySelector('input[name="q' + i + '"]:checked') || {}).value || '';
+    });
+    LOYALTY.forEach(function (q, i) {
+      payload['LQ' + (i + 1) + ' (EN)'] = q.en;
+      payload['LA' + (i + 1)] = (loyaltyWrap.querySelector('input[name="lq' + i + '"]:checked') || {}).value || '';
+    });
+    payload.assessmentLanguage = lang === 'en' ? 'English' : 'Tagalog';
+    payload.submittedAt = new Date().toISOString();
+
+    var btn = document.getElementById('finalSubmitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    fetch(APP_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    })
+      .then(function (r) { return r.text(); })
+      .then(function (msg) {
+        if (msg.indexOf('success') === -1) throw new Error(msg);
+        showSuccess();
+      })
+      .catch(function (err) {
+        btn.disabled = false;
+        btn.textContent = 'Submit Application';
+        alert('Submission failed: ' + err.message + '\nPlease try again.');
+      });
+  }
+
   document.getElementById('loyaltyForm').addEventListener('submit', function (e) {
     e.preventDefault();
     if (!validateContainer(loyaltyWrap)) return;
-    alert('Thank you! Your application and all assessments have been submitted.');
+    handleSubmit();
   });
 })();
 </script>
