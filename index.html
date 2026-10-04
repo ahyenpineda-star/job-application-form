@@ -584,17 +584,18 @@
     });
   });
 
-  function goStep2() {
-    if (!form.reportValidity()) return;
+  function validateQuestions() {
     var missing = [];
     wrap.querySelectorAll('.q-card').forEach(function (card) {
       if (!card.querySelector('input:checked')) { card.classList.add('missing'); missing.push(card); }
       else card.classList.remove('missing');
     });
-    if (missing.length) {
-      missing[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
-    }
+    if (missing.length) missing[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return !missing.length;
+  }
+
+  function goStep2() {
+    if (!form.reportValidity()) return;
     page1.hidden = true;
     page2.hidden = false;
     window.scrollTo({ top: 0 });
@@ -609,18 +610,12 @@
   });
 
   mainSubmitBtn.addEventListener('click', function () {
-    var missing = [];
-    wrap.querySelectorAll('.q-card').forEach(function (card) {
-      if (!card.querySelector('input:checked')) { card.classList.add('missing'); missing.push(card); }
-      else card.classList.remove('missing');
-    });
-    if (missing.length) {
-      missing[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+    validateQuestions();
   });
 
   document.getElementById('assessmentForm').addEventListener('submit', function (e) {
     e.preventDefault();
+    if (!validateQuestions()) return;
     alert('Thank you! Your application and assessment have been submitted.');
   });
 })();
