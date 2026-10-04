@@ -504,7 +504,7 @@
 <div class="form-container">
   <div class="form-header">
     <h1>Character & Behavioral Assessment</h1>
-    <p>Part 2 of 2 &mdash; Answer honestly; there are no right or wrong answers.</p>
+    <p>Part 2 of 3 &mdash; Answer honestly; there are no right or wrong answers.</p>
   </div>
 
   <button id="backBtn" type="button" class="back-link">&larr; Back to Application Form</button>
@@ -519,6 +519,32 @@
     </div>
 
     <div id="questionsWrap"></div>
+
+    <button id="toStep3Btn" type="button" class="submit-btn">Continue to Loyalty Check &rarr;</button>
+    <p class="form-note">Your information will be kept confidential and used only for recruitment purposes.</p>
+  </form>
+</div>
+</section>
+
+<section id="page3" class="page" hidden>
+<div class="form-container">
+  <div class="form-header">
+    <h1>Loyalty & Commitment Check</h1>
+    <p>Part 3 of 3 &mdash; Final step. Answer honestly; there are no right or wrong answers.</p>
+  </div>
+
+  <button id="back2Btn" type="button" class="back-link">&larr; Back to Assessment</button>
+
+  <form id="loyaltyForm">
+    <div class="form-group">
+      <label class="lang-label">Language for questions <span class="required">*</span></label>
+      <div class="lang-toggle" role="group" aria-label="Loyalty question language">
+        <button type="button" class="lang-btn active" data-lang="en">English</button>
+        <button type="button" class="lang-btn" data-lang="tl">Tagalog</button>
+      </div>
+    </div>
+
+    <div id="loyaltyWrap"></div>
 
     <button type="submit" class="submit-btn">Submit Application</button>
     <p class="form-note">Your information will be kept confidential and used only for recruitment purposes.</p>
@@ -556,15 +582,37 @@
   var REQUIRED_MSG_EN = "Please select an answer for this question.";
   var REQUIRED_MSG_TL = "Piliin ang isang sagot para sa tanong na ito.";
 
+  var LOYALTY = [
+    { en: "If another company offers me a slightly higher salary, I would still stay with this company.",
+      tl: "Kahit may ibang kompanyang nag-aalok sa akin ng bahagyang mas mataas na sahod, mananatili pa rin ako sa kompanyang ito." },
+    { en: "I see myself still working with this company five years from now.",
+      tl: "Nakikita ko ang aking sarili na nagtatrabaho pa rin sa kompanyang ito pagkatapos ng limang taon." },
+    { en: "I would defend the company's reputation if someone speaks badly about it.",
+      tl: "Ipinagtatanggol ko ang pangalan ng kompanya kapag may nagsasabi ng masama tungkol dito." },
+    { en: "I am willing to stay during urgent situations when the company needs extra help.",
+      tl: "Handa akong manatili sa mga agarang sitwasyon kapag kailangan ng kompanya ng karagdagang tulong." },
+    { en: "I speak positively about the company to family, friends, and outsiders.",
+      tl: "Nagsasabi ako ng maganda tungkol sa kompanya sa aking pamilya, kaibigan, at mga taga-labas." },
+    { en: "I would decline a better offer from a competitor out of loyalty to this company.",
+      tl: "Tatanggihan ko ang mas magandang alok mula sa kalabang kompanya dahil sa katapatan sa kompanyang ito." },
+    { en: "I avoid sharing company confidential matters with outsiders.",
+      tl: "Iniiwasan kong ibahagi sa mga taga-labas ang mga confidential na bagay tungkol sa kompanya." },
+    { en: "I am committed to helping the company grow, not just my own career.",
+      tl: "Komersado ako na tulungan lumago ang kompanya, hindi lamang ang aking sariling karera." }
+  ];
+
   var form = document.getElementById('applicationForm');
   var step1Submit = document.getElementById('toStep2Btn');
   var page1 = document.getElementById('page1');
   var page2 = document.getElementById('page2');
+  var page3 = document.getElementById('page3');
   var backBtn = document.getElementById('backBtn');
+  var back2Btn = document.getElementById('back2Btn');
   var wrap = document.getElementById('questionsWrap');
+  var loyaltyWrap = document.getElementById('loyaltyWrap');
   var lang = 'en';
 
-  var mainSubmitBtn = document.getElementById('assessmentForm').querySelector('button[type="submit"]');
+  var step3Submit = document.getElementById('toStep3Btn');
 
   function renderQuestions() {
     var scale = lang === 'en' ? SCALE_EN : SCALE_TL;
@@ -581,31 +629,63 @@
     wrap.innerHTML = html;
   }
 
+  function renderLoyalty() {
+    var scale = lang === 'en' ? SCALE_EN : SCALE_TL;
+    var html = '';
+    LOYALTY.forEach(function (q, i) {
+      html += '<div class="q-card" data-lq="' + i + '">' +
+        '<div class="q-text">' + (i + 1) + '. ' + q[lang] + '</div>' +
+        '<div class="scale-row">';
+      scale.forEach(function (opt, v) {
+        html += '<label><input type="radio" name="lq' + i + '" value="' + v + '"> ' + opt + '</label>';
+      });
+      html += '</div><div class="q-error">' + REQUIRED_MSG_EN + '</div></div>';
+    });
+    loyaltyWrap.innerHTML = html;
+  }
+
+  function saveAnswers(container, prefix) {
+    var answers = {};
+    container.querySelectorAll('.q-card').forEach(function (card) {
+      var checked = card.querySelector('input:checked');
+      var key = card.dataset.q !== undefined ? card.dataset.q : card.dataset.lq;
+      if (checked) answers[key] = checked.value;
+      card.classList.remove('missing');
+    });
+    return answers;
+  }
+
+  function restoreAnswers(container, answers, prefix) {
+    Object.keys(answers).forEach(function (i) {
+      var input = container.querySelector('input[name="' + prefix + i + '"][value="' + answers[i] + '"]');
+      if (input) input.checked = true;
+    });
+  }
+
   renderQuestions();
+  renderLoyalty();
+
+  function switchLang(newLang) {
+    if (newLang === lang) return;
+    lang = newLang;
+    var a1 = saveAnswers(wrap, 'q');
+    var a2 = saveAnswers(loyaltyWrap, 'lq');
+    renderQuestions();
+    renderLoyalty();
+    restoreAnswers(wrap, a1, 'q');
+    restoreAnswers(loyaltyWrap, a2, 'lq');
+  }
 
   document.querySelectorAll('.lang-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      var prev = lang;
-      lang = btn.dataset.lang;
-      if (lang === prev) return;
       document.querySelectorAll('.lang-btn').forEach(function (b) { b.classList.toggle('active', b === btn); });
-      var answers = {};
-      document.querySelectorAll('.q-card').forEach(function (card, i) {
-        var checked = card.querySelector('input:checked');
-        if (checked) answers[i] = checked.value;
-        card.classList.remove('missing');
-      });
-      renderQuestions();
-      Object.keys(answers).forEach(function (i) {
-        var input = wrap.querySelector('input[name="q' + i + '"][value="' + answers[i] + '"]');
-        if (input) input.checked = true;
-      });
+      switchLang(btn.dataset.lang);
     });
   });
 
-  function validateQuestions() {
+  function validateContainer(container) {
     var missing = [];
-    wrap.querySelectorAll('.q-card').forEach(function (card) {
+    container.querySelectorAll('.q-card').forEach(function (card) {
       if (!card.querySelector('input:checked')) { card.classList.add('missing'); missing.push(card); }
       else card.classList.remove('missing');
     });
@@ -628,14 +708,31 @@
     window.scrollTo({ top: 0 });
   });
 
-  mainSubmitBtn.addEventListener('click', function () {
-    validateQuestions();
+  step3Submit.addEventListener('click', function () {
+    if (!validateContainer(wrap)) return;
+    page2.hidden = true;
+    page3.hidden = false;
+    window.scrollTo({ top: 0 });
+  });
+
+  back2Btn.addEventListener('click', function () {
+    page3.hidden = true;
+    page2.hidden = false;
+    window.scrollTo({ top: 0 });
   });
 
   document.getElementById('assessmentForm').addEventListener('submit', function (e) {
     e.preventDefault();
-    if (!validateQuestions()) return;
-    alert('Thank you! Your application and assessment have been submitted.');
+    if (!validateContainer(wrap)) return;
+    page2.hidden = true;
+    page3.hidden = false;
+    window.scrollTo({ top: 0 });
+  });
+
+  document.getElementById('loyaltyForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!validateContainer(loyaltyWrap)) return;
+    alert('Thank you! Your application and all assessments have been submitted.');
   });
 })();
 </script>
